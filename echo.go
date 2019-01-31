@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"net"
 	"os"
@@ -28,22 +27,13 @@ func readln(r *bufio.Reader) (string, error) {
 }
 
 func main() {
-	port := flag.String("p", "", "port")
-	flag.Usage = func() {
-		flag.PrintDefaults()
-	}
-	flag.Parse()
+	port := "8080"
 
-	if *port == "" {
-		flag.Usage()
-		os.Exit(0)
-	}
-
-	l, err := net.Listen("tcp", ":"+*port)
+	l, err := net.Listen("tcp", ":"+port)
 	handleError(err, "Listen()")
 
 	defer l.Close()
-	fmt.Println("Listening on Port", *port)
+	fmt.Println("Listening on Port", port)
 	conn, err := l.Accept()
 	handleError(err, "Accept()")
 
@@ -51,16 +41,13 @@ func main() {
 	fmt.Printf("Connected to : %v\n", conn.RemoteAddr())
 	reader := bufio.NewReader(conn)
 	for {
-		_, err = fmt.Fprintf(conn, "Exit using STOP \r\n")
-		handleError(err, "first Fprintf()")
 
 		str, err := readln(reader)
 		handleError(err, "readln()")
 		if str == "stop" {
 			os.Exit(0)
 		}
-		fmt.Println("Input:" + str)
-		_, err = fmt.Fprintf(conn, "Input: %s\r\n", str)
-		handleError(err, "second Fprintf()")
+		_, err = fmt.Fprintf(conn, "%s\r\n", str)
+		handleError(err, "Fprintf()")
 	}
 }
