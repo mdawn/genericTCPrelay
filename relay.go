@@ -3,53 +3,47 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math/rand"
 	"net"
 	"os"
-	"strings"
-	"time"
 )
 
-func handleConnection(c net.Conn) {
-	fmt.Printf("Serving %s\n", c.RemoteAddr().String())
-	for {
-		netData, err := bufio.NewReader(c).ReadString('\n')
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		temp := strings.TrimSpace(string(netData))
-		if temp == "STOP" {
-			break
-		}
-
+func handleError(err error, msg string) {
+	if err != nil {
+		fmt.Printf("Error: %s : %s\n", msg, err.Error())
+		os.Exit(1)
 	}
-	c.Close()
 }
 
 func main() {
-	arguments := os.Args
-	if len(arguments) == 1 {
-		fmt.Println("Please provide a port number!")
-		return
-	}
+	fmt.Println("relay runs")
 
-	p := ":" + arguments[1]
-	l, err := net.Listen("tcp4", p)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	var echoServerURL = "localhost:8080"
+	e, _ := net.Dial("tcp", echoServerURL)
+
+	port := "8081"
+
+	l, err := net.Listen("tcp", ":"+port)
+	handleError(err, "Listen()")
+
 	defer l.Close()
-	rand.Seed(time.Now().Unix())
+	fmt.Println("Listening on Port", port)
+	c, err := l.Accept()
+	handleError(err, "Accept()")
+
+	defer c.Close()
+	fmt.Printf("Connected to : %v\n", c.RemoteAddr())
+	reader := bufio.NewReader(c)
 
 	for {
-		c, err := l.Accept()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		go handleConnection(c)
+		text, _ := reader.ReadString('\n')
+		// send
+		fmt.Fprintf(e, text+"\n")
+		// listen & return message
+		m, _ := bufio.NewReader(e).ReadString('\n')
+		fmt.Print("Message from server: " + m)
+		// passes msg along
+		_, err = fmt.Fprintf(c, "%s\r\n", m)
+		handleError(err, "Fprintf()")
 	}
+
 }
