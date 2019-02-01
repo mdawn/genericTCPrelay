@@ -4,7 +4,15 @@ import (
 	"bufio"
 	"fmt"
 	"net"
+	"os"
 )
+
+func handleError2(err error, msg string) {
+	if err != nil {
+		fmt.Printf("Error: %s : %s\n", msg, err.Error())
+		os.Exit(1)
+	}
+}
 
 func handleConnection(c net.Conn, e net.Conn) {
 
@@ -27,23 +35,40 @@ func handleConnection(c net.Conn, e net.Conn) {
 
 func main() {
 
-	fmt.Println("relay runs")
+	// server port
+	port := "8080"
 
-	var echoServerURL = "localhost:8080"
+	l, err := net.Listen("tcp", ":"+port)
+	s, _ := l.Accept()
 
-	port := "8081"
+	handleError2(err, "Listen()")
+
+	defer l.Close()
 	fmt.Println("Listening on Port", port)
+	handleError2(err, "Accept()")
 
-	e, _ := net.Dial("tcp", echoServerURL)
-	l, _ := net.Listen("tcp", ":"+port)
+	defer s.Close()
+	fmt.Printf("Connected to : %v\n", s.RemoteAddr())
+	bufio.NewReader(s)
+
+	// client port
+	port2 := "8081"
+
+	t, err := net.Listen("tcp", ":"+port2)
+
+	handleError2(err, "Listen()")
+
+	defer t.Close()
+	fmt.Println("Listening on Port", port2)
+	handleError2(err, "Accept()")
 
 	for {
-		c, err := l.Accept()
+		c, err := t.Accept()
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		go handleConnection(c, e)
+		go handleConnection(c, s)
 	}
 
 }

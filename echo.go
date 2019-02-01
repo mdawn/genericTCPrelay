@@ -27,19 +27,11 @@ func readln(r *bufio.Reader) (string, error) {
 }
 
 func main() {
-	port := "8080"
+	var relayServer = "localhost:8080"
 
-	l, err := net.Listen("tcp", ":"+port)
-	handleError(err, "Listen()")
-
-	defer l.Close()
-	fmt.Println("Listening on Port", port)
-	conn, err := l.Accept()
-	handleError(err, "Accept()")
-
-	defer conn.Close()
-	fmt.Printf("Connected to : %v\n", conn.RemoteAddr())
+	conn, _ := net.Dial("tcp", relayServer)
 	reader := bufio.NewReader(conn)
+
 	for {
 
 		str, err := readln(reader)
