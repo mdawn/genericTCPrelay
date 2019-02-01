@@ -32,6 +32,11 @@ func main() {
 	conn, _ := net.Dial("tcp", relayServer)
 	reader := bufio.NewReader(conn)
 
+	// read public address from relay
+	addr, err := readln(reader)
+	handleError(err, "readln()")
+	fmt.Println(addr)
+
 	for {
 
 		str, err := readln(reader)

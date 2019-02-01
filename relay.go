@@ -37,7 +37,10 @@ func main() {
 
 	// server port
 	port := "8080"
+	// client port
+	port2 := "8081"
 
+	//server handling
 	l, err := net.Listen("tcp", ":"+port)
 	s, _ := l.Accept()
 
@@ -51,9 +54,9 @@ func main() {
 	fmt.Printf("Connected to : %v\n", s.RemoteAddr())
 	bufio.NewReader(s)
 
-	// client port
-	port2 := "8081"
+	fmt.Fprintf(s, "established relay address: localhost "+port2+"\n")
 
+	// client handling
 	t, err := net.Listen("tcp", ":"+port2)
 
 	handleError2(err, "Listen()")
