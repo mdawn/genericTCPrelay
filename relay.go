@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
+	"log"
 	"net"
 	"os"
 )
@@ -33,30 +35,47 @@ func handleConnection(c net.Conn, e net.Conn) {
 	}
 }
 
+type options struct {
+	port string
+}
+
+var opt options
+
 func main() {
 
-	// server port
-	port := "8080"
-	// client port
-	port2 := "8081"
-
 	//server handling
-	l, err := net.Listen("tcp", ":"+port)
+
+	flag.StringVar(&opt.port, "p", os.Getenv("PORT"), "The default port to listen on")
+	flag.Parse()
+
+	if opt.port == "" {
+		opt.port = "8080"
+	}
+
+	flag.Parse()
+
+	log.Printf("[INFO] Listening on %s\n", opt.port)
+
+	l, err := net.Listen("tcp", ":"+opt.port)
 	s, _ := l.Accept()
 
 	handleError2(err, "Listen()")
 
 	defer l.Close()
-	fmt.Println("Listening on Port", port)
+	fmt.Println("Listening on Port", opt.port)
 	handleError2(err, "Accept()")
 
 	defer s.Close()
 	fmt.Printf("Connected to : %v\n", s.RemoteAddr())
 	bufio.NewReader(s)
 
-	fmt.Fprintf(s, "established relay address: localhost "+port2+"\n")
+	fmt.Fprintf(s, "established relay address: localhost "+opt.port+"\n")
 
 	// client handling
+
+	// client port
+	port2 := "8081"
+
 	t, err := net.Listen("tcp", ":"+port2)
 
 	handleError2(err, "Listen()")

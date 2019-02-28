@@ -27,7 +27,7 @@ func readln(r *bufio.Reader) (string, error) {
 }
 
 func main() {
-	var relayServer = "localhost:8080"
+	var relayServer = "localhost:8090"
 
 	conn, _ := net.Dial("tcp", relayServer)
 	reader := bufio.NewReader(conn)
