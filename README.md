@@ -14,7 +14,6 @@ TODO
 
 A little system with a single relay server that supports multiple echos, and allows each echo to have multiple clients(telnet). 
 
-[Evans](https://github.com/ktr0731/evans)
 
 
 ## What We Need
