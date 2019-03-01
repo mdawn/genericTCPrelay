@@ -16,36 +16,36 @@ We're on a Mac, right? Of course we are.
 With this TCP we can:
 
 1. Run our relay with a selected listen port
-2. Run multiple servers concurrently (an echo & a ping)
+2. Run multiple servers concurrently (I've provided an echo & a ping for your enjoyment) 
 3. Run multiple clients concurrently per server (we use telnet)
-
-## Getting Operational
-
-**STEP 1**: We open a terminal and  
-- Run `go run relay.go`
-- The default port is `8080` if none is specified. However, we're free to use flag `-p` to designate a port for compatibility with concurrent relays
-
-**STEP 2**: We open another terminal and 
-- Run `go run echo.go`
-- Running this returns the `established relay address`
-
-**STEP 3**: We open our last terminal and
-- Run `telnet localhost 8081`
-
-Then we can type our little hearts out:
-- ex. `Hello, world` echoes back `Hello, world`
 
 ## Example Scenario
 
-You wrote a program that, tragically, sits behind a firewall. You desperately want to expose your server! Fortunately we can use a TCP connection to bypass the firewall. 
+You wrote a program that, tragically, sits behind a firewall. You desperately want to expose your server! Fortunately we can bypass the firewall with a relay. 
 
-**First:** Run the relay server and choose a host port for it, such as `8080`. Initiate a connection to that host port.
+**STEP 1**: 
+We open a terminal and run the relay server, initiating a connection
+- Run `go run relay.go`
+- The default port is `8080` if none is specified. However, we're free to use flag `-p` to designate a port for compatibility with concurrent relays
 
-**Second:** Once connected, the relay server graciously allows you to read and use a different port for your clients to use, such as `8081`. Tell your clients to connect to that port so the relay can host them as well. 
+**STEP 2**: 
+Now we connect our server.
 
-**Second:** Now you and your client are both being hosted by the relay via TCP channel. It's party time. 
+We open another terminal and 
+- Run `go run echo.go` (our server we want to connect, in this case)
+- Running this returns the `established relay address` 
+- Tell your clients to connect to this `established relay address`
+
+**STEP 3**: We open our last terminal and
+- Run `telnet localhost 8081` 
+(where `8081` is the `established relay address`)
+
+Now you and your client are both being hosted by the relay via TCP channel. It's party time!
+
+We can type our little hearts out:
+- ex. `Hello, world` echoes back `Hello, world`
 
 
 ## What would make it better
 
-- Stress testing, security audit, graceful shutdown, scripts, etc.
+- Stress testing, security audit, etc.  
