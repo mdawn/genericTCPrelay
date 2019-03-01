@@ -1,20 +1,8 @@
-Terminal 1: go run relay.go
-Terminal 2: go run echo.go
-Terminal 3: telnet localhost 8081
-
-Why 3 separate terminals?  Because go hates that func main repeat, and the go routine in relay could use a channel to speed things up. As it stands, my version of telnet fails with much speed. 
-
-TODO
-- Works with one server (& many clients), & only reads strings
-- Ports are hard coded
-
-
-**************
 # Generic TCP 
 
+## Description
+
 A little system with a single relay server that supports multiple echos, and allows each echo to have multiple clients(telnet). 
-
-
 
 ## What We Need
 
@@ -34,18 +22,31 @@ With this TCP we can:
 ## Getting Operational
 
 **STEP 1**: We open a terminal and  
-- `xxx`
+- Run `go run relay.go`
+- No specified port defaults to `8080`. However, we're free to utilize the optional flag `-p` to designate a port for compatibility with concurrent relays
 
 **STEP 2**: We open another terminal and 
-- Install gRPC: `xxx`
+- Run `go run echo.go`
+- Running this returns the `established relay address`
 
-**STEP 3**: We open our last terminal
-- `xxx`
+**STEP 3**: We open our last terminal and
+- Run `telnet localhost 8081`
 
-Then connect:
-- `xxx`
+Then we can type our little hearts out:
+- ex. `Hello, world` echoes back `Hello, world`
+
+## Example Scenario
+
+You wrote a program that, tragically, sits behind a firewall. You desperately want to expose your server! 
+
+Fortunately we can use a TCP connection to bypass the firewall. 
+**First:** Run the relay server and choose a port. Have your program connect on that same port. Your server will read the relay address through that connection.
+**Second:** The relay server provides a different port for your clients to use. Tell your clients to connect to the relay server on that port. 
+
+The relay server acts as an intermediary between our program's server and our desired clients - here we used telnet. 
 
 
 ## What would make it better
 
-- Stress testing & security audit, among other measures
+- A script to reduce the annoyance of having to open 3 terminals
+- Stress testing, security audit, among other measures

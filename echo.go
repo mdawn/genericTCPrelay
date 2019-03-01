@@ -14,18 +14,6 @@ func handleError(err error, msg string) {
 	}
 }
 
-func readln(r *bufio.Reader) (string, error) {
-	input, err := r.ReadString('\n')
-	if err != nil {
-		return "", err
-	}
-	input = input[:len(input)-1]
-	if input[len(input)-1] == '\r' {
-		input = input[:len(input)-1]
-	}
-	return input, nil
-}
-
 func main() {
 	var relayServer = "localhost:8090"
 
@@ -33,18 +21,26 @@ func main() {
 	reader := bufio.NewReader(conn)
 
 	// read public address from relay
-	addr, err := readln(reader)
-	handleError(err, "readln()")
+
+	addr, err := reader.ReadString('\n')
+	fmt.Println("read an address string: " + addr)
+	if err != nil {
+		fmt.Println("there was an error reading from client")
+		return
+	}
+
+	// handleError(err, "readln()1")
 	fmt.Println(addr)
 
 	for {
-
-		str, err := readln(reader)
-		handleError(err, "readln()")
-		if str == "stop" {
-			os.Exit(0)
+		str, err := reader.ReadString('\n')
+		fmt.Println("I read the string: " + str)
+		if err != nil {
+			fmt.Println("there was an error reading the string: " + str)
+			return
 		}
 		_, err = fmt.Fprintf(conn, "%s\r\n", str)
 		handleError(err, "Fprintf()")
 	}
+
 }

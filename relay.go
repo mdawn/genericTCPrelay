@@ -25,11 +25,12 @@ func handleConnection(c net.Conn, e net.Conn) {
 
 	for {
 		text, _ := reader.ReadString('\n')
+		fmt.Println("message from client: " + text)
 		// send
-		fmt.Fprintf(e, text+"\n")
+		fmt.Fprintf(e, text)
 		// listen & return message
 		m, _ := bufio.NewReader(e).ReadString('\n')
-		fmt.Print("Message from server: " + m)
+		fmt.Println("Message from echo server: " + m)
 		// passes msg along
 		fmt.Fprintf(c, "%s\r\n", m)
 	}
