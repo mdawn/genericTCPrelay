@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 )
 
 func handleError2(err error, msg string) {
@@ -36,6 +37,36 @@ func handleConnection(c net.Conn, e net.Conn) {
 	}
 }
 
+func multiServ(s net.Conn, p int) {
+
+	defer s.Close()
+	fmt.Printf("Connected to: %v\n", s.RemoteAddr())
+	bufio.NewReader(s)
+
+	fmt.Fprintf(s, "established relay address: localhost "+opt.port+"\n")
+
+	// client handling
+
+	// client port
+
+	t, err := net.Listen("tcp", ":"+strconv.Itoa(p))
+
+	handleError2(err, "Listen()")
+
+	defer t.Close()
+	fmt.Println("Listening for client on Port", p)
+	handleError2(err, "Accept()")
+
+	for {
+		c, err := t.Accept()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		go handleConnection(c, s)
+	}
+}
+
 type options struct {
 	port string
 }
@@ -50,7 +81,7 @@ func main() {
 	flag.Parse()
 
 	if opt.port == "" {
-		opt.port = "8080"
+		opt.port = "7"
 	}
 
 	flag.Parse()
@@ -58,40 +89,18 @@ func main() {
 	log.Printf("[INFO] Listening on %s\n", opt.port)
 
 	l, err := net.Listen("tcp", ":"+opt.port)
-	s, _ := l.Accept()
 
-	handleError2(err, "Listen()")
+	p := 8081
 
-	defer l.Close()
-	fmt.Println("Listening on Port", opt.port)
-	handleError2(err, "Accept()")
-
-	defer s.Close()
-	fmt.Printf("Connected to : %v\n", s.RemoteAddr())
-	bufio.NewReader(s)
-
-	fmt.Fprintf(s, "established relay address: localhost "+opt.port+"\n")
-
-	// client handling
-
-	// client port
-	port2 := "8081"
-
-	t, err := net.Listen("tcp", ":"+port2)
-
-	handleError2(err, "Listen()")
-
-	defer t.Close()
-	fmt.Println("Listening on Port", port2)
-	handleError2(err, "Accept()")
-
+	// accept concurrent server & cleint connections
 	for {
-		c, err := t.Accept()
+		s, _ := l.Accept()
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		go handleConnection(c, s)
+		go multiServ(s, p)
+		p++
 	}
 
 }
