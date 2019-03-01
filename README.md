@@ -2,7 +2,7 @@
 
 ## Description
 
-A little system with a single relay server that supports multiple echos, and allows each echo to have multiple clients(telnet). 
+A system with a single relay server which supports multiple servers and, in turn, multiple clients for each server. 
 
 ## What We Need
 
@@ -15,15 +15,15 @@ We're on a Mac, right? Of course we are.
 
 With this TCP we can:
 
-1. Run two relays at the same time, given we tell the relays what port to listen on
-2. Run multiple echo servers concurrently
-3. Run multiple clients concurrently per echo server
+1. Run our relay with a selected listen port
+2. Run multiple servers concurrently (an echo & a ping)
+3. Run multiple clients concurrently per server (we use telnet)
 
 ## Getting Operational
 
 **STEP 1**: We open a terminal and  
 - Run `go run relay.go`
-- No specified port defaults to `8080`. However, we're free to utilize the optional flag `-p` to designate a port for compatibility with concurrent relays
+- The default port is `8080` if none is specified. However, we're free to use flag `-p` to designate a port for compatibility with concurrent relays
 
 **STEP 2**: We open another terminal and 
 - Run `go run echo.go`
@@ -37,16 +37,15 @@ Then we can type our little hearts out:
 
 ## Example Scenario
 
-You wrote a program that, tragically, sits behind a firewall. You desperately want to expose your server! 
+You wrote a program that, tragically, sits behind a firewall. You desperately want to expose your server! Fortunately we can use a TCP connection to bypass the firewall. 
 
-Fortunately we can use a TCP connection to bypass the firewall. 
-**First:** Run the relay server and choose a port. Have your program connect on that same port. Your server will read the relay address through that connection.
-**Second:** The relay server provides a different port for your clients to use. Tell your clients to connect to the relay server on that port. 
+**First:** Run the relay server and choose a host port for it, such as `8080`. Initiate a connection to that host port.
 
-The relay server acts as an intermediary between our program's server and our desired clients - here we used telnet. 
+**Second:** Once connected, the relay server graciously allows you to read and use a different port for your clients to use, such as `8081`. Tell your clients to connect to that port so the relay can host them as well. 
+
+**Second:** Now you and your client are both being hosted by the relay via TCP channel. It's party time. 
 
 
 ## What would make it better
 
-- A script to reduce the annoyance of having to open 3 terminals
-- Stress testing, security audit, among other measures
+- Stress testing, security audit, graceful shutdown, scripts, etc.
