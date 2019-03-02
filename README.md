@@ -26,7 +26,7 @@ You wrote a program that, tragically, sits behind a firewall. You desperately wa
 **STEP 1**: 
 We open a terminal and run the relay server, initiating a connection
 - Run `go run relay.go`
-- The default port is `8080` if none is specified. However, we're free to use flag `-p` to designate a port for compatibility with concurrent relays
+- The default port is `7` if none is specified. However, we're free to use flag `-p` to designate a port for compatibility with concurrent relays
 
 **STEP 2**: 
 Now we connect our server.
@@ -48,4 +48,4 @@ We can type our little hearts out:
 
 ## What would make it better
 
-- Stress testing, security audit, etc.  
+- Stress testing, security audit, read binary, etc.  
